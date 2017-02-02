@@ -1,14 +1,29 @@
-import { 
-  app,
-  controls,
-  App,
-  Box,
-  Icosahedron,
-  PointLight,
-  AmbientLight,
-} from 'whs';
+import {
+  VirtualMouseModule,
+  ElementModule,
+  SceneModule,
+  CameraModule,
+  RenderingModule,
+  ResizeModule,
+} from '@whs:app';
 
-import 'three';
+import { OrbitModule } from '@whs:controls/orbit';
+
+import { App } from '@whs/core/App';
+
+import { AmbientLight } from '@whs+lights/AmbientLight';
+import { PointLight } from '@whs+lights/PointLight';
+
+import { Box } from '@whs+meshes/Box';
+import { Icosahedron } from '@whs+meshes/Icosahedron';
+
+import {
+  Vector3,
+  PCFSoftShadowMap,
+  MeshNormalMaterial,
+  FlatShading,
+  banana,
+} from '@three';
 
 import {
   WorldModule,
@@ -19,32 +34,43 @@ import {
 
 
 export default function init(container, { ammoPath }) {
-  const mouse = new app.VirtualMouseModule();
+  const ballMaterial = new MeshNormalMaterial({
+    shading: FlatShading,
+  });
+
+  const boxMaterial = new MeshNormalMaterial({
+    shading: FlatShading,
+    transparent: true,
+    opacity: 0.5,
+  });
+
+
+  const mouse = new VirtualMouseModule();
 
   const world = new App([
-    new app.ElementModule({ container }),
-    new app.SceneModule(),
-    new app.CameraModule({
-      position: new THREE.Vector3(0, 0, 200)
+    new ElementModule({ container }),
+    new SceneModule(),
+    new CameraModule({
+      position: new Vector3(0, 0, 200)
     }),
-    new app.RenderingModule({
+    new RenderingModule({
       bgColor: 0xFFFFFF,
       bgOpacity: 0,
       renderer: {
         alpha: true,
         antialias: true,
         shadowmap: {
-          type: THREE.PCFSoftShadowMap
+          type: PCFSoftShadowMap
         }
       }
     }),
     new WorldModule({
       ammo: ammoPath,
-      gravity: new THREE.Vector3(0, -200, 0),
-      softbody: true,
+      gravity: new Vector3(0, -100, 0),
+      // softbody: true,
     }),
-    // new controls.OrbitModule(),
-    new app.ResizeModule(),
+    new ResizeModule(),
+    // new OrbitModule(),
     mouse
   ]);
 
@@ -71,11 +97,7 @@ export default function init(container, { ammoPath }) {
         })
       ],
 
-      material: new THREE.MeshNormalMaterial({
-        shading: THREE.FlatShading,
-        transparent: true,
-        opacity: 0.5
-      }),
+      material: boxMaterial,
     });
   }
 
@@ -135,29 +157,29 @@ export default function init(container, { ammoPath }) {
     box.addTo(world).then(() => {
       mouse.track(box);
 
-      box.setLinearFactor(new THREE.Vector3(0, 0, 0));
-      box.setAngularFactor(new THREE.Vector3(0, 0, 0));
+      box.setLinearFactor(new Vector3(0, 0, 0));
+      box.setAngularFactor(new Vector3(0, 0, 0));
 
       const states = [];
 
       states.push(() => {
         // down
-        world.setGravity(new THREE.Vector3(0, -200, 0));
+        world.setGravity(new Vector3(0, -200, 0));
       })
 
       states.push(() => {
         // left
-        world.setGravity(new THREE.Vector3(-200, 0, 0));
+        world.setGravity(new Vector3(-200, 0, 0));
       })
 
       states.push(() => {
         // up
-        world.setGravity(new THREE.Vector3(0, 200, 0));
+        world.setGravity(new Vector3(0, 200, 0));
       })
 
       states.push(() => {
         // right
-        world.setGravity(new THREE.Vector3(200, 0, 0));
+        world.setGravity(new Vector3(200, 0, 0));
       })
 
       let currentState = 0;
@@ -195,21 +217,9 @@ export default function init(container, { ammoPath }) {
         restitution: 3,
         friction: 1
       }),
-      // new PHYSICS.SoftbodyModule({
-      //   mass: 10000,
-      //   margin: 1,
-      // }),
-      // new PHYSICS.SphereModule({
-      //   mass: 10,
-      //   restitution: 2,
-      //   friction: 2,
-      //   // scale: new THREE.Vector3(2, 10, 1)
-      // }),
     ],
 
-    material: new THREE.MeshNormalMaterial({
-      shading: THREE.FlatShading
-    }),
+    material: ballMaterial,
 
     position: [0, 30, 0]
   }).defer(ball => {
@@ -239,8 +249,7 @@ export default function init(container, { ammoPath }) {
   world.start();
 
   return function destory() {
-
+    console.log('TODO: Destory spatial cube');
   }
-
 }
 
