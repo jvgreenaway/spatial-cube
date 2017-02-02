@@ -1,10 +1,11 @@
 const webpack = require('webpack');
 
 module.exports = {
-  entry: './src/app.js',
+  entry: './src/index.js',
   output: {
-    path: __dirname + '/dist',
-    filename: 'app.bundle.js',
+    path: __dirname + '/build',
+    filename: 'index.js',
+    libraryTarget: 'umd',
   },
   target: 'web',
   module: {
@@ -15,9 +16,6 @@ module.exports = {
     }],
   },
   plugins: [
-    new webpack.DefinePlugin({
-      'process.ammoPath': '"http://127.0.0.1:8000/dist/ammo.js"',
-    }),
     new webpack.NormalModuleReplacementPlugin(/inline\-worker/, 'webworkify-webpack'),
     new webpack.optimize.UglifyJsPlugin({
       compress: {
@@ -26,6 +24,5 @@ module.exports = {
       },
       minimize: true,
     }),
-    // new webpack.optimize.DedupePlugin(),
   ]
 };

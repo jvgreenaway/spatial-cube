@@ -1,11 +1,14 @@
 {
-  "name": "spatial-whitestorm",
+  "name": "spatial-cube",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --config ./webpack.config.js"
+    "build": "webpack --config ./webpack.config.js",
+    "build:dev": "webpack --config ./webpack.development.js",
+    "serve": "ws",
+    "install": "yarn run install"
   },
   "author": "",
   "license": "ISC",
