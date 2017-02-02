@@ -43,7 +43,7 @@ export default function init(container, { ammoPath }) {
       gravity: new THREE.Vector3(0, -200, 0),
       softbody: true,
     }),
-    new controls.OrbitModule(),
+    // new controls.OrbitModule(),
     new app.ResizeModule(),
     mouse
   ]);
