@@ -2,7 +2,7 @@
   "name": "spatial-cube",
   "version": "1.0.0",
   "description": "",
-  "main": "build/bundle.js",
+  "main": "build/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:dev": "webpack --config ./webpack.development.js",

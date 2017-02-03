@@ -4,7 +4,7 @@ import alias from 'whs/tools/alias';
 const isProduction = process.env.NODE_ENV === 'production';
 
 const config = {
-  entry: './src/entry.js',
+  entry: './src/index.js',
 
   module: {
     rules: [
@@ -30,14 +30,15 @@ const config = {
       new webpack.optimize.UglifyJsPlugin()
     ]
     : [
-      new webpack.DefinePlugin({
-        'process.ammoPath': '"http://127.0.0.1:8080/vendor/ammo.js"',
-      }),
+      // new webpack.DefinePlugin({
+      //   'process.ammoPath': '"http://127.0.0.1:8080/vendor/ammo.js"',
+      // }),
     ],
 
   output: {
     path: './build/',
-    filename: 'bundle.js'
+    filename: 'index.js',
+    libraryTarget: 'umd',
   },
 
   devServer: {
