@@ -33,7 +33,13 @@ import {
 } from 'physics-module-ammonext';
 
 
-export default function init(container, { ammoPath }) {
+export default function init(container, { ammoPath, onGravity = () => {} }) {
+  const setGravity = (...args) => {
+    world.setGravity(new Vector3(...args));
+    onGravity(args);
+  }
+
+
   const ballMaterial = new MeshNormalMaterial({
     shading: FlatShading,
   });
@@ -164,22 +170,22 @@ export default function init(container, { ammoPath }) {
 
       states.push(() => {
         // down
-        world.setGravity(new Vector3(0, -200, 0));
+        setGravity(0, -200, 0);
       })
 
       states.push(() => {
         // left
-        world.setGravity(new Vector3(-200, 0, 0));
+        setGravity(-200, 0, 0);
       })
 
       states.push(() => {
         // up
-        world.setGravity(new Vector3(0, 200, 0));
+        setGravity(0, 200, 0);
       })
 
       states.push(() => {
         // right
-        world.setGravity(new Vector3(200, 0, 0));
+        setGravity(200, 0, 0);
       })
 
       let currentState = 0;
