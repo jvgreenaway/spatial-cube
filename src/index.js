@@ -32,8 +32,9 @@ import {
   ConvexModule,
 } from 'physics-module-ammonext';
 
+const noop = () => {}
 
-export default function init(container, { ammoPath, onGravity = () => {} }) {
+export default function init(container, { ammoPath, onGravity = noop, onRotation = noop }) {
   const setGravity = (...args) => {
     world.setGravity(new Vector3(...args));
     onGravity(args);
@@ -200,11 +201,17 @@ export default function init(container, { ammoPath, onGravity = () => {} }) {
       // Click box to change state
       box.on('click', cycleStates)
 
+      const setRotation = (...args) => {
+        box.rotation.x = args[0]
+        box.rotation.y = args[1]
+        box.rotation.z = args[2]
+        box.__dirtyRotation = true
+        onRotation([...args])
+      }
+
       // Move box with mouse
       mouse.on('move', () => {
-        box.rotation.x = -mouse.y
-        box.rotation.y = mouse.x
-        box.__dirtyRotation = true;
+        setRotation(-mouse.y, mouse.x, 0)
       });
     });
   });
