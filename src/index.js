@@ -5,17 +5,17 @@ import {
   CameraModule,
   RenderingModule,
   ResizeModule,
-} from '@whs:app';
+} from '@whs:app'
 
-import { OrbitModule } from '@whs:controls/orbit';
+import { OrbitModule } from '@whs:controls/orbit'
 
-import { App } from '@whs/core/App';
+import { App } from '@whs/core/App'
 
-import { AmbientLight } from '@whs+lights/AmbientLight';
-import { PointLight } from '@whs+lights/PointLight';
+import { AmbientLight } from '@whs+lights/AmbientLight'
+import { PointLight } from '@whs+lights/PointLight'
 
-import { Box } from '@whs+meshes/Box';
-import { Icosahedron } from '@whs+meshes/Icosahedron';
+import { Box } from '@whs+meshes/Box'
+import { Icosahedron } from '@whs+meshes/Icosahedron'
 
 import {
   Vector3,
@@ -23,42 +23,47 @@ import {
   MeshNormalMaterial,
   FlatShading,
   banana,
-} from '@three';
+} from '@three'
 
 import {
   WorldModule,
   BoxModule,
   CompoundModule,
   ConvexModule,
-} from 'physics-module-ammonext';
+} from 'physics-module-ammonext'
 
 const noop = () => {}
 
-export default function init(container, { ammoPath, onGravity = noop, onRotation = noop }) {
-  const setGravity = (...args) => {
-    world.setGravity(new Vector3(...args));
-    onGravity(args);
+
+export default function init(
+  container, 
+  { ammoPath, onGravity = noop, onRotation = noop }
+) {
+
+  function setGravity(...args) {
+    world.setGravity(new Vector3(...args))
+    onGravity(args)
   }
 
 
   const ballMaterial = new MeshNormalMaterial({
     shading: FlatShading,
-  });
+  })
 
   const boxMaterial = new MeshNormalMaterial({
     shading: FlatShading,
     transparent: true,
     opacity: 0.5,
-  });
+  })
 
 
-  const mouse = new VirtualMouseModule();
+  const mouse = new VirtualMouseModule()
 
   const world = new App([
     new ElementModule({ container }),
     new SceneModule(),
     new CameraModule({
-      position: new Vector3(0, 0, 200)
+      position: new Vector3(0, 0, 200),
     }),
     new RenderingModule({
       bgColor: 0xFFFFFF,
@@ -67,9 +72,9 @@ export default function init(container, { ammoPath, onGravity = noop, onRotation
         alpha: true,
         antialias: true,
         shadowmap: {
-          type: PCFSoftShadowMap
-        }
-      }
+          type: PCFSoftShadowMap,
+        },
+      },
     }),
     new WorldModule({
       ammo: ammoPath,
@@ -78,8 +83,8 @@ export default function init(container, { ammoPath, onGravity = noop, onRotation
     }),
     new ResizeModule(),
     // new OrbitModule(),
-    mouse
-  ]);
+    mouse,
+  ])
 
 
   // Create all sides of the box
@@ -90,12 +95,12 @@ export default function init(container, { ammoPath, onGravity = noop, onRotation
       geometry: {
         width: size,
         height: size,
-        depth: 0
+        depth: 0,
       },
 
       shadow: {
         cast: false,
-        receive: false
+        receive: false,
       },
 
       modules: [
@@ -105,7 +110,7 @@ export default function init(container, { ammoPath, onGravity = noop, onRotation
       ],
 
       material: boxMaterial,
-    });
+    })
   }
 
   // Create wireframe box
@@ -113,7 +118,7 @@ export default function init(container, { ammoPath, onGravity = noop, onRotation
     geometry: {
       width: 100,
       height: 100,
-      depth: 100
+      depth: 100,
     },
 
     shadow: {
@@ -123,146 +128,142 @@ export default function init(container, { ammoPath, onGravity = noop, onRotation
 
     modules: [
       new CompoundModule({
-        mass: 100
-      })
+        mass: 100,
+      }),
     ],
 
     position: [0, 0, 0],
-    rotation: [0, Math.PI, 0]
-  }).defer(box => {
+    rotation: [0, Math.PI, 0],
+  }).defer((box) => {
 
-    const makeBoxWall = (...params) => boxWall(...params).addTo(box);
-
-    makeBoxWall({
-      position: [0, 0, 50]
-    });
+    const makeBoxWall = (...params) => boxWall(...params).addTo(box)
 
     makeBoxWall({
-      position: [0, 0, -50]
-    });
+      position: [0, 0, 50],
+    })
 
     makeBoxWall({
-      rotation: {x: -Math.PI / 2},
-      position: [0, 50, 0]
-    });
+      position: [0, 0, -50],
+    })
 
     makeBoxWall({
       rotation: {x: -Math.PI / 2},
-      position: [0, -50, 0]
-    });
+      position: [0, 50, 0],
+    })
+
+    makeBoxWall({
+      rotation: {x: -Math.PI / 2},
+      position: [0, -50, 0],
+    })
 
     makeBoxWall({
       rotation: {y: -Math.PI / 2},
-      position: [50, 0, 0]
-    });
+      position: [50, 0, 0],
+    })
 
     makeBoxWall({
       rotation: {y: -Math.PI / 2},
-      position: [-50, 0, 0]
-    });
+      position: [-50, 0, 0],
+    })
 
     box.addTo(world).then(() => {
-      mouse.track(box);
+      mouse.track(box)
 
-      box.setLinearFactor(new Vector3(0, 0, 0));
-      box.setAngularFactor(new Vector3(0, 0, 0));
+      box.setLinearFactor(new Vector3(0, 0, 0))
+      box.setAngularFactor(new Vector3(0, 0, 0))
 
-      const states = [];
+      const states = []
 
       states.push(() => {
-        // down
-        setGravity(0, -200, 0);
+        setGravity(0, -200, 0) // down
       })
 
       states.push(() => {
-        // left
-        setGravity(-200, 0, 0);
+        setGravity(-200, 0, 0) // left
       })
 
       states.push(() => {
-        // up
-        setGravity(0, 200, 0);
+        setGravity(0, 200, 0) // up
       })
 
       states.push(() => {
-        // right
-        setGravity(200, 0, 0);
+        setGravity(200, 0, 0) // right
       })
 
-      let currentState = 0;
-      states[currentState]();
+      let currentState = 0
+      states[currentState]()
 
       const cycleStates = () => {
-        currentState++;
-        if (currentState >= states.length) currentState = 0;
-        states[currentState]();
+        currentState++
+        if (currentState >= states.length) currentState = 0
+        states[currentState]()
       }
 
       // Click box to change state
       box.on('click', cycleStates)
 
-      const setRotation = (...args) => {
+      function setRotation(...args) {
         box.rotation.x = args[0]
         box.rotation.y = args[1]
         box.rotation.z = args[2]
         box.__dirtyRotation = true
-        onRotation([...args])
+        onRotation(args)
       }
 
       // Move box with mouse
       mouse.on('move', () => {
         setRotation(-mouse.y, mouse.x, 0)
-      });
-    });
-  });
+      })
+    })
+  })
 
 
   // Create a ball
   new Icosahedron({
     geometry: {
       radius: 30,
-      detail: 2
+      detail: 2,
     },
 
     modules: [
       new ConvexModule({
         mass: 10,
         restitution: 3,
-        friction: 1
+        friction: 1,
       }),
     ],
 
     material: ballMaterial,
 
-    position: [0, 30, 0]
+    position: [0, 30, 0],
   }).defer(ball => {
-    ball.addTo(world);
-  });
+    ball.addTo(world)
+  })
 
   new PointLight({
     light: {
       intensity: 1,
-      distance: 1000
+      distance: 1000,
     },
 
     shadow: {
-      fov: 500
+      fov: 500,
     },
 
-    position: [10, 10, 100]
+    position: [10, 10, 100],
   })
-  .addTo(world);
+  .addTo(world)
 
   new AmbientLight({
     light: {
-      intensity: 0.5
-    }
-  }).addTo(world);
+      intensity: 0.5,
+    },
+  }).addTo(world)
 
-  world.start();
+  world.start()
 
   return function destory() {
-    console.log('TODO: Destory spatial cube');
+    console.log('TODO: Destory spatial cube')
   }
 }
 
