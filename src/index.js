@@ -22,7 +22,6 @@ import {
   PCFSoftShadowMap,
   MeshNormalMaterial,
   FlatShading,
-  banana,
 } from '@three'
 
 import {
@@ -203,10 +202,18 @@ export default function init(
       box.on('click', cycleStates)
 
       function setRotation(...args) {
-        box.rotation.x = args[0]
-        box.rotation.y = args[1]
-        box.rotation.z = args[2]
-        box.__dirtyRotation = true
+        
+        // Geometric rotation
+        // box.rotation.x = args[0]
+        // box.rotation.y = args[1]
+        // box.rotation.z = args[2]
+        // box.__dirtyRotation = true
+
+        // Velocity change
+        const factor = 5
+        const v = new Vector3(args[0] * factor, args[1] * factor, args[2] * factor)
+        box.setAngularVelocity(v)
+
         onRotation(args)
       }
 
