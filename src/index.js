@@ -35,10 +35,12 @@ import {
 import TWEEN from 'tween.js'
 import snapLerp from 'snap-lerp'
 
+const boxSize = 120
+
 
 const noop = () => {}
 
-const boxWall = (attrs = {}, size = 100) => new Box({
+const boxWall = (attrs = {}, size = boxSize) => new Box({
   ...attrs,
 
   geometry: {
@@ -90,12 +92,14 @@ export default function init(
     new SceneModule(),
     new CameraModule({
       position: new Vector3(0, 0, 200),
+      far: 10000,
     }),
     new RenderingModule({
       bgColor: 0xFFFFFF,
       bgOpacity: 0,
       renderer: {
         alpha: true,
+
         antialias: true,
         shadowmap: {
           type: PCFSoftShadowMap,
@@ -121,8 +125,8 @@ export default function init(
 
     modules: [
       new ConvexModule({
-        mass: 1,
-        restitution: 3.5,
+        mass: 3,
+        restitution: 3.2,
         friction: 0,
       }),
     ],
@@ -158,9 +162,9 @@ export default function init(
   // Create wireframe box
   const box = new Box({
     geometry: {
-      width: 100,
-      height: 100,
-      depth: 100,
+      width: boxSize,
+      height: boxSize,
+      depth: boxSize,
     },
 
     shadow: {
@@ -181,31 +185,31 @@ export default function init(
     const makeBoxWall = (...params) => boxWall(...params).addTo(box)
 
     makeBoxWall({
-      position: [0, 0, 50],
+      position: [0, 0, boxSize/2],
     })
 
     makeBoxWall({
-      position: [0, 0, -50],
-    })
-
-    makeBoxWall({
-      rotation: {x: -Math.PI / 2},
-      position: [0, 50, 0],
+      position: [0, 0, -boxSize/2],
     })
 
     makeBoxWall({
       rotation: {x: -Math.PI / 2},
-      position: [0, -50, 0],
+      position: [0, boxSize/2, 0],
+    })
+
+    makeBoxWall({
+      rotation: {x: -Math.PI / 2},
+      position: [0, -boxSize/2, 0],
     })
 
     makeBoxWall({
       rotation: {y: -Math.PI / 2},
-      position: [50, 0, 0],
+      position: [boxSize/2, 0, 0],
     })
 
     makeBoxWall({
       rotation: {y: -Math.PI / 2},
-      position: [-50, 0, 0],
+      position: [-boxSize/2, 0, 0],
     })
 
     box.addTo(world).then(() => {
@@ -291,6 +295,17 @@ export default function init(
       // Update cube roation velocity
       new Loop(() => {
         box.setAngularVelocity(new Vector3(targetVelocity.x, targetVelocity.y, targetVelocity.z))
+      }).start(world)
+
+
+      const targetZoom = world.$camera._native.zoom * 12
+
+      // Update camera perspective      
+      new Loop(() => {
+        world.$camera._native.zoom = snapLerp(world.$camera._native.zoom, targetZoom, 0.01)
+        world.$camera._native.position.z = snapLerp(world.$camera._native.position.z, 2000, 0.01)
+        
+        world.$camera._native.updateProjectionMatrix()
       }).start(world)
 
 
