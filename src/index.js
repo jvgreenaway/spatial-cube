@@ -33,10 +33,13 @@ import {
 } from 'physics-module-ammonext'
 
 import TWEEN from 'tween.js'
-import snapLerp from 'snap-lerp'
+
+import followMouse from './follow-mouse'
+import dollyZoom from './dolly-zoom'
+import cycleStates from './cycle-states'
+
 
 const boxSize = 120
-
 
 const noop = () => {}
 
@@ -80,11 +83,6 @@ export default function init(
   { ammoPath, onGravity = noop, onRotation = noop }
 ) {
 
-  function setGravity(...args) {
-    world.setGravity(new Vector3(...args))
-    onGravity(args)
-  }
-
   const mouse = new VirtualMouseModule()
 
   const world = new App([
@@ -92,7 +90,7 @@ export default function init(
     new SceneModule(),
     new CameraModule({
       position: new Vector3(0, 0, 200),
-      far: 10000,
+      far: 11000,
     }),
     new RenderingModule({
       bgColor: 0xFFFFFF,
@@ -160,7 +158,7 @@ export default function init(
 
 
   // Create wireframe box
-  const box = new Box({
+  new Box({
     geometry: {
       width: boxSize,
       height: boxSize,
@@ -183,147 +181,59 @@ export default function init(
   }).defer((box) => {
 
     const makeBoxWall = (...params) => boxWall(...params).addTo(box)
+    const walls = [
+      {
+        position: [0, 0, boxSize/2],
+      },
+      {
+        position: [0, 0, -boxSize/2],
+      },
+      {
+        rotation: { x: -Math.PI / 2 },
+        position: [0, boxSize/2, 0],
+      },
+      {
+        rotation: { x: -Math.PI / 2 },
+        position: [0, -boxSize/2, 0],
+      },
+      {
+        rotation: { y: -Math.PI / 2 },
+        position: [boxSize/2, 0, 0],
+      },
+      {
+        rotation: { y: -Math.PI / 2 },
+        position: [-boxSize/2, 0, 0],
+      },
+    ]
 
-    makeBoxWall({
-      position: [0, 0, boxSize/2],
-    })
-
-    makeBoxWall({
-      position: [0, 0, -boxSize/2],
-    })
-
-    makeBoxWall({
-      rotation: {x: -Math.PI / 2},
-      position: [0, boxSize/2, 0],
-    })
-
-    makeBoxWall({
-      rotation: {x: -Math.PI / 2},
-      position: [0, -boxSize/2, 0],
-    })
-
-    makeBoxWall({
-      rotation: {y: -Math.PI / 2},
-      position: [boxSize/2, 0, 0],
-    })
-
-    makeBoxWall({
-      rotation: {y: -Math.PI / 2},
-      position: [-boxSize/2, 0, 0],
-    })
+    walls.forEach(wall => makeBoxWall(wall))
 
     box.addTo(world).then(() => {
-      mouse.track(box)
-
       box.setLinearFactor(new Vector3(0, 0, 0))
       box.setAngularFactor(new Vector3(0, 0, 0))
 
-      const states = []
-
-      states.push(() => {
-        setGravity(0, -200, 0) // down
+      dollyZoom(world, box).then(() => {
+        // cycleStates(world, box, mouse, onGravity)
+        followMouse(world, box, mouse, onRotation)
       })
-
-      states.push(() => {
-        setGravity(-200, 0, 0) // left
-      })
-
-      states.push(() => {
-        setGravity(0, 200, 0) // up
-      })
-
-      states.push(() => {
-        setGravity(200, 0, 0) // right
-      })
-
-      let currentState = 0
-      states[currentState]()
-
-      const cycleStates = () => {
-        currentState++
-        if (currentState >= states.length) currentState = 0
-        states[currentState]()
-      }
-
-      // Click box to change state
-      box.on('click', cycleStates)
-
-      const t = 0.1
-      const min = 0.0001
-
-      const rotationFactor = 1.5
-      const targetRotation = { x: box.rotation.x, y: box.rotation.y, z: box.rotation.z }
-
-      const setRotationGeometry = (...args) => {
-        // Geometric rotation
-        targetRotation.x = args[0] * rotationFactor
-        targetRotation.y = args[1] * rotationFactor
-        targetRotation.z = args[2] * rotationFactor
-        
-        // Callback
-        onRotation(args)
-      }
-
-
-      const velocityFactor = 4
-      const targetVelocity = { x: 0, y: 0, z: 0 }
-
-      const setRotationVelocity = (...args) => {
-        // Velocity change
-        targetVelocity.x = args[0] * velocityFactor
-        targetVelocity.y = args[1] * velocityFactor
-        targetVelocity.z = args[2] * velocityFactor
-        
-        // Callback
-        onRotation(args)
-      }
-
-      // Move box with mouse
-      mouse.on('move', () => {
-        // setRotationGeometry(-mouse.y, mouse.x, 0)
-        setRotationVelocity(-mouse.y, mouse.x, 0)
-      })
-
-      // Update cube rotation geometry
-      // new Loop(() => {
-      //   box.rotation.x = snapLerp(box.rotation.x, targetRotation.x, t)
-      //   box.rotation.y = snapLerp(box.rotation.y, targetRotation.y, t)
-      //   box.rotation.z = snapLerp(box.rotation.z, targetRotation.z, t)
-      //   box.__dirtyRotation = true
-      // }).start(world)
-
-      // Update cube roation velocity
-      new Loop(() => {
-        box.setAngularVelocity(new Vector3(targetVelocity.x, targetVelocity.y, targetVelocity.z))
-      }).start(world)
-
-
-      const targetZoom = world.$camera._native.zoom * 12
-
-      // Update camera perspective      
-      new Loop(() => {
-        world.$camera._native.zoom = snapLerp(world.$camera._native.zoom, targetZoom, 0.01)
-        world.$camera._native.position.z = snapLerp(world.$camera._native.position.z, 2000, 0.01)
-        
-        world.$camera._native.updateProjectionMatrix()
-      }).start(world)
-
 
       // new Loop((clock) => {
       //   TWEEN.update(clock.getElapsedTime())
       // }).start(world)
-      
-      // setTimeout(() => {
-      //   function animate(time) {
-      //     requestAnimationFrame(animate)
-      //     TWEEN.update(time)
-      //   }
-      //   animate()
-      //   tweenCube.start()
-      // }, 1000)
+
+
+      setTimeout(() => {
+        function animate(time) {
+          requestAnimationFrame(animate)
+          TWEEN.update(time)
+        }
+        animate()
+      }, 100)
+
 
       world.start()
     })
+
   })
 
   return function destory() {
