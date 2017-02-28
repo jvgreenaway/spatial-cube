@@ -1,3 +1,4 @@
+import path from 'path';
 import webpack from 'webpack';
 import alias from 'whs/tools/alias';
 
@@ -47,10 +48,14 @@ const config = {
   },
 
   resolve: {
-    alias
-  }
+    alias: {
+      ...alias,
+      gyro: path.join(__dirname, 'node_modules/gyro.js/js/gyro.js'),
+    },
+  },
 };
 
 export {
-  config as default
+  config as default,
+  isProduction,
 };

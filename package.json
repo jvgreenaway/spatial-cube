@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
-    "start": "webpack-dev-server --config webpack.dev.babel.js"
+    "start": "webpack-dev-server --config webpack.dev.babel.js --host 0.0.0.0"
   },
   "author": "",
   "license": "ISC",
@@ -23,6 +23,7 @@
     "babel-preset-stage-2": "^6.22.0",
     "babel-register": "^6.22.0",
     "glslify-loader": "^1.0.2",
+    "gyronorm": "git://github.com/dorukeker/gyronorm.js.git#v2.0.6",
     "local-web-server": "^1.2.6",
     "raw-loader": "^0.5.1",
     "snap-lerp": "^1.1.0",

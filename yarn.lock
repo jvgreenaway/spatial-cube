@@ -1856,6 +1856,10 @@ graceful-fs@^4.1.2:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/graceful-readlink/-/graceful-readlink-1.0.1.tgz#4cafad76bc62f02fa039b2f94e9a3dd3a391a725"
 
+"gyronorm@git://github.com/dorukeker/gyronorm.js.git#v2.0.6":
+  version "2.0.6"
+  resolved "git://github.com/dorukeker/gyronorm.js.git#b2db9a39e83ff1396bb4c08ea7d1cf2671c6f679"
+
 har-validator@~2.0.6:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/har-validator/-/har-validator-2.0.6.tgz#cdcbc08188265ad119b6a5a7c8ab70eecfb5d27d"

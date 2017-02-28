@@ -3,7 +3,7 @@ import { Loop } from '@whs/core/Loop'
 import snapLerp from 'snap-lerp'
 
 
-export default function cycleStates(world, box, mouse, onRotation) {
+export default function followMouse(world, box, mouse, onRotation) {
 
   // const t = 0.1
   // const rotationFactor = 1.5
@@ -45,6 +45,7 @@ export default function cycleStates(world, box, mouse, onRotation) {
   }
 
   new Loop(() => {
+    // TODO: lerp angular velocity change
     box.setAngularVelocity(new Vector3(targetVelocity.x, targetVelocity.y, targetVelocity.z))
   }).start(world)
 

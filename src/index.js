@@ -37,6 +37,7 @@ import TWEEN from 'tween.js'
 import followMouse from './follow-mouse'
 import dollyZoom from './dolly-zoom'
 import cycleStates from './cycle-states'
+import gyroController from './gyro-controller'
 
 
 const boxSize = 120
@@ -214,7 +215,9 @@ export default function init(
 
       dollyZoom(world, box).then(() => {
         // cycleStates(world, box, mouse, onGravity)
-        followMouse(world, box, mouse, onRotation)
+
+        gyroController(world, box, onRotation)
+          .catch(() => followMouse(world, box, mouse, onRotation))
       })
 
       // new Loop((clock) => {
